@@ -1,23 +1,43 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
+  <div id="appointmentguru-booking-widget">
     <router-view></router-view>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'app'
+  name: 'appointmentguru-booking-widget',
+  computed: {
+    practitioner () { return window.practitioner },
+    store () { return this.$gurustore.state }
+  },
+  mounted () {
+    this.$gurustore.dispatch(
+      'FETCH_PRACTITIONER_ACTION',
+      this.practitioner
+    )
+    this.$gurustore.dispatch('FETCH_APPOINTMENTS_ACTION')
+  },
+  methods: {
+    incr () {
+      this.$gurustore.commit('increment')
+    }
+  }
 }
 </script>
 
 <style>
-#app {
+#appointmentguru-booking-widget {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  background-color: transparent;
   color: #2c3e50;
   margin-top: 60px;
+  width: 375px;
+  height: 100%;
+  margin-left: auto; margin-right: auto;
+  border: solid 1px;
+  padding: 0px;
 }
 </style>

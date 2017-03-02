@@ -2,6 +2,34 @@
 
 > The booking widget for AppointmentGuru
 
+## Installation
+
+### As POJS
+
+**Add the css**
+
+```
+<!-- booking widget -->
+<link href=https://rawgit.com/AppointmentGuru/BookingWidget/master/dist/static/css/app.7f579fee2a793577918ffa358df24afb.css rel=stylesheet>
+```
+
+**Add the js**
+
+```
+<script >window.practitioner = '6'</script>
+<script type=text/javascript src=https://rawgit.com/AppointmentGuru/BookingWidget/master/dist/static/js/manifest.b2717fd3ba438a6c8b03.js></script>
+<script type=text/javascript src=https://rawgit.com/AppointmentGuru/BookingWidget/master/dist/static/js/vendor.f50244fbe055d7c9b9e2.js></script>
+<script type=text/javascript src=https://rawgit.com/AppointmentGuru/BookingWidget/master/dist/static/js/app.9292de40a7c3a29710ff.js></script>
+```
+
+**Add the widget:**
+
+<div id="appointmentguru-booking-widget" ></div>
+
+### In a VueJS app:
+
+...
+
 ## Build Setup
 
 ``` bash
