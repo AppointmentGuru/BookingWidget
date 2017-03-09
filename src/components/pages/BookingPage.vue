@@ -1,10 +1,10 @@
 <template>
   <div >
-    <div >
+    <!-- <div >
     {{selectedDate}}<br/>
     <pre>{{appointment}}</pre>
     <pre>{{slotOptions}}</pre>
-    </div>
+    </div> -->
     <el-steps
       style='width:350px;margin-left:auto;margin-right:auto;'
       :active="currentStep"
@@ -57,7 +57,8 @@
 import ChooseAppointmentType from '../ChooseAppointmentType'
 import DatePicker from 'gurucomponents/src/components/client/appointment/DatePicker'
 import SlotPicker from 'gurucomponents/src/components/client/appointment/SlotPicker'
-import ContactDetailsForm from '../ContactDetailsForm'
+// import ContactDetailsForm from '../ContactDetailsForm'
+import ContactDetailsForm from 'gurucomponents/src/components/ui/forms/ContactDetailsForm'
 import Toolbar from '../Toolbar'
 import moment from 'moment'
 
@@ -77,9 +78,12 @@ export default {
       selectedService: {},
       selectedSlot: {},
       contactDetails: {
-        fullName: '',
-        email: '',
-        phone: ''
+        fullName: null,
+        email: null,
+        phone: null,
+        countryCode: null,
+        formattedNumber: null,
+        country: {}
       }
     }
   },
