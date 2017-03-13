@@ -19,7 +19,8 @@ import {
   Autocomplete,
   Scrollbar,
   Progress, Loading, Notification,
-  Tabs, TabPane
+  Tabs, TabPane,
+  Row
 } from 'element-ui'
 
 import 'element-ui/lib/theme-default/index.css'
@@ -46,6 +47,7 @@ Vue.use(Loading)
 Vue.use(Tabs)
 Vue.use(TabPane)
 Vue.use(Notification)
+Vue.use(Row)
 
 /* eslint-disable no-new */
 new Vue({

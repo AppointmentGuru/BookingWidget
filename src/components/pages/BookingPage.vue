@@ -37,6 +37,7 @@ Slotpicker:
 
       <el-carousel-item >
         <choose-appointment-type
+          id='appointment-type'
           @bookingwidget:productselected='appointmentTypeSelected' >
         </choose-appointment-type>
       </el-carousel-item>
@@ -46,17 +47,21 @@ Slotpicker:
           @datepicker:rangechanged='updateActiveDateRange'
           v-model='selectedDate' >
         </date-picker>
-        <div style='padding: 10px; 5px; text-align:center;'>
+        <div style='padding: 10px; 5px; text-align:center;font-weight:bold;'>
           {{naturalday(selectedDate)}}
         </div>
-        <slot-picker
-          v-if='selectedProduct'
-          :operation-hours='slotOptions.operationHours'
-          :slot-duration='slotOptions.duration'
-          :day='slotOptions.day'
-          :appointments='selectedDayAppointments'
-          @slotpicker:slotselected='slotSelected' >
-        </slot-picker>
+        <el-row
+          v-loading="loadingAppointments"
+          element-loading-text="checking availability..." >
+          <slot-picker
+            v-if='selectedProduct'
+            :operation-hours='slotOptions.operationHours'
+            :slot-duration='slotOptions.duration'
+            :day='slotOptions.day'
+            :appointments='selectedDayAppointments'
+            @slotpicker:slotselected='slotSelected' >
+          </slot-picker>
+        </el-row>
       </el-carousel-item>
 
       <el-carousel-item >
@@ -104,6 +109,7 @@ export default {
       showSteps: true,
       currentStep: 0,
       loading: false,
+      loadingAppointments: false,
       appointmentComplete: false,
       selectedDate: moment().add(1, 'day').format('YYYY-MM-DD'),
       selectedProduct: {},
@@ -193,10 +199,18 @@ export default {
       this.currentStep++
     },
     goto (step) {
-      this.currentStep = step
+      if (this.currentStep >= step) {
+        this.currentStep = step
+      }
     },
     updateActiveDateRange (daterange) {
+      let vm = this
+      vm.loadingAppointments = true
+      this.selectedDate = daterange.toDate
       this.$gurustore.dispatch('SET_DATE_RANGE_ACTION', daterange)
+        .then(() => {
+          vm.loadingAppointments = false
+        })
     },
     appointmentTypeSelected (payload) {
       this.selectedService = payload.service

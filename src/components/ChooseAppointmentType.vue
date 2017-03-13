@@ -1,9 +1,5 @@
 <template>
-<div>
-  <el-card class="box-card">
-    <div slot="header" class="clearfix">
-      <span style="line-height: 36px;">What type of appointment?</span>
-    </div>
+<div class='box'>
     <div v-for='service in services' >
       <h5>{{service.address.name}}</h5>
       <div
@@ -13,7 +9,6 @@
         {{product.title}}
       </div>
     </div>
-  </el-card>
 </div>
 </template>
 <script type="text/javascript">
@@ -40,6 +35,9 @@ export default {
 }
 </script>
 <style scoped>
+.box{
+  padding: 20px;
+}
 .item {
   padding: 20px 0px;
   line-height: 16px;
@@ -47,5 +45,11 @@ export default {
 }
 .pull-right {
   float:right;
+}
+.header {
+  padding: 18px 0px;
+  border-bottom: 1px solid #d1dbe5;
+  box-sizing: border-box;
+  font-weight: bold;
 }
 </style>
