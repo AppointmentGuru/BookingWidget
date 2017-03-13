@@ -15,8 +15,11 @@ import {
   CarouselItem,
   Form,
   FormItem,
-  Input
-  // AutoComplete
+  Input,
+  Autocomplete,
+  Scrollbar,
+  Progress, Loading, Notification,
+  Tabs, TabPane
 } from 'element-ui'
 
 import 'element-ui/lib/theme-default/index.css'
@@ -36,7 +39,13 @@ Vue.use(CarouselItem)
 Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Input)
-// Vue.use(AutoComplete)
+Vue.use(Autocomplete)
+Vue.use(Scrollbar)
+Vue.use(Progress)
+Vue.use(Loading)
+Vue.use(Tabs)
+Vue.use(TabPane)
+Vue.use(Notification)
 
 /* eslint-disable no-new */
 new Vue({

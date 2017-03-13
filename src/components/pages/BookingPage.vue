@@ -6,12 +6,15 @@ Slotpicker:
 -->
 <template>
   <div >
-    <div >
+
+    <!--<div >
     {{selectedDate}}<br/>
     <pre>{{appointment}}</pre>
     <pre>{{slotOptions}}</pre>
     </div>
+    -->
     <el-steps
+      v-show='showSteps'
       style='width:350px;margin-left:auto;margin-right:auto;'
       :active="currentStep"
       process-status='process'
@@ -28,7 +31,9 @@ Slotpicker:
       :autoplay='false'
       trigger='none'
       arrow='never'
-      indicator-position='none' >
+      indicator-position='none'
+      v-loading="loading"
+      element-loading-text="Creating appointment..." >
 
       <el-carousel-item >
         <choose-appointment-type
@@ -36,7 +41,10 @@ Slotpicker:
         </choose-appointment-type>
       </el-carousel-item>
       <el-carousel-item >
-        <date-picker v-model='selectedDate' >
+        <br/>
+        <date-picker
+          @datepicker:rangechanged='updateActiveDateRange'
+          v-model='selectedDate' >
         </date-picker>
         <div style='padding: 10px; 5px; text-align:center;'>
           {{naturalday(selectedDate)}}
@@ -50,14 +58,21 @@ Slotpicker:
           @slotpicker:slotselected='slotSelected' >
         </slot-picker>
       </el-carousel-item>
+
       <el-carousel-item >
         <contact-details-form v-model='contactDetails' >
         </contact-details-form>
       </el-carousel-item>
+
+      <el-carousel-item >
+        <confirmation-page ></confirmation-page>
+      </el-carousel-item>
+
     </el-carousel>
     <toolbar
-      @toolbar:click='createAppointment'
-      text='Create Appointment'></toolbar>
+      :disabled='!appointmentIsValid'
+      @toolbar:click='toolbarClicked'
+      :text='toolbarBtnText'></toolbar>
   </div>
 </template>
 
@@ -67,6 +82,7 @@ import DatePicker from 'gurucomponents/src/components/client/appointment/DatePic
 import SlotPicker from 'gurucomponents/src/components/client/appointment/SlotPicker'
 // import ContactDetailsForm from '../ContactDetailsForm'
 import ContactDetailsForm from 'gurucomponents/src/components/ui/forms/ContactDetailsForm'
+import ConfirmationPage from '../ConfirmationPage'
 import Toolbar from '../Toolbar'
 import moment from 'moment'
 
@@ -76,12 +92,20 @@ export default {
   name: 'BookingPage',
   mixins: [Mixins],
   components: {
-    SlotPicker, ChooseAppointmentType, DatePicker, ContactDetailsForm, Toolbar
+    SlotPicker,
+    ChooseAppointmentType,
+    DatePicker,
+    ContactDetailsForm,
+    Toolbar,
+    ConfirmationPage
   },
   data () {
     return {
+      showSteps: true,
       currentStep: 0,
-      selectedDate: moment().format('YYYY-MM-DD'),
+      loading: false,
+      appointmentComplete: false,
+      selectedDate: moment().add(1, 'day').format('YYYY-MM-DD'),
       selectedProduct: {},
       selectedService: {},
       selectedSlot: {},
@@ -94,6 +118,14 @@ export default {
         country: {}
       }
     }
+  },
+  mounted () {
+    this.$gurustore.dispatch(
+      'FETCH_PRACTITIONER_ACTION',
+      window.practitioner
+    ).then(() => {
+      this.$gurustore.dispatch('FETCH_APPOINTMENTS_ACTION')
+    })
   },
   watch: {
     currentStep () {
@@ -111,6 +143,23 @@ export default {
         contact_email: this.contactDetails.email,
         practitioner: window.practitioner,
         source: 'booking-widget'
+      }
+    },
+    appointmentIsValid () {
+      return (this.appointment.start_time &&
+        this.appointment.end_time &&
+        this.appointment.product &&
+        this.appointment.full_name &&
+        this.appointment.contact_phone &&
+        this.appointment.contact_email &&
+        this.appointment.practitioner &&
+        this.appointment.source)
+    },
+    toolbarBtnText () {
+      if (this.appointmentComplete) {
+        return 'Download the app'
+      } else {
+        return 'Create appointment'
       }
     },
     selectedDayAppointments () {
@@ -132,7 +181,6 @@ export default {
       if (this.selectedService.hours) {
         operationHours = this.selectedService.hours[dt.toLowerCase()]
       }
-      console.log(operationHours)
       return {
         operationHours: operationHours,
         duration: parseInt(this.selectedProduct.duration) || 60,
@@ -147,6 +195,9 @@ export default {
     goto (step) {
       this.currentStep = step
     },
+    updateActiveDateRange (daterange) {
+      this.$gurustore.dispatch('SET_DATE_RANGE_ACTION', daterange)
+    },
     appointmentTypeSelected (payload) {
       this.selectedService = payload.service
       this.selectedProduct = payload.product
@@ -156,13 +207,29 @@ export default {
       this.selectedSlot = slot
       this.next()
     },
+    toolbarClicked () {
+      if (this.appointmentComplete) {
+        window.location = 'http://www.getapp.guru/'
+      } else {
+        this.createAppointment()
+      }
+    },
     createAppointment () {
+      this.loading = true
+      this.showSteps = false
       this.$gurustore.dispatch(
         'CREATE_APPOINTMENT_ACTION',
         this.appointment)
           .then((response) => {
-            console.log(response.data)
-            window.alert('Appointment created!!!11!!!11')
+            this.appointmentComplete = true
+            this.next()
+            this.loading = false
+          })
+          .catch((response) => {
+            window.alert('There was an error submitting your appointment. Please try again')
+
+            this.showSteps = true
+            this.loading = false
           })
     }
   }
@@ -179,5 +246,11 @@ export default {
 }
 .el-card__header {
   font-weight: bold;
+}
+.el-input-group__prepend .el-input__inner {
+  min-width: 60px;
+  background: transparent !important;
+  border: 0px;
+  height: 34px;
 }
 </style>

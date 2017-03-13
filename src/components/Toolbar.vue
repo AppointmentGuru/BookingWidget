@@ -14,6 +14,7 @@
 <div class='toolbar'>
   <el-button
     @click='$emit("toolbar:click")'
+    :disabled='this.disabled'
     class='btn-block' type="primary" size="large">{{text}}</el-button>
 </div>
 </template>

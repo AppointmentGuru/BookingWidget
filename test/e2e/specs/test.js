@@ -2,7 +2,7 @@
 // http://nightwatchjs.org/guide#usage
 
 module.exports = {
-  'default e2e tests': function (browser) {
+  'Create Appointment': function (browser) {
     // automatically uses dev Server port from /config.index.js
     // default: http://localhost:8080
     // see nightwatch.conf.js
@@ -10,10 +10,14 @@ module.exports = {
 
     browser
       .url(devServer)
-      .waitForElementVisible('#app', 5000)
-      .assert.elementPresent('.hello')
-      .assert.containsText('h1', 'Welcome to Your Vue.js App')
-      .assert.elementCount('img', 1)
+      .waitForElementVisible('#appointmentguru-booking-widget', 5000)
+      .waitForElementVisible('.item', 2000)
+      .click('.item')
+      .pause(1000)
+        // page 2: select date/time
+        .click('.flatpickr-next-month')
+        .pause(500)
+        .click('.flatpickr-day')
       .end()
   }
 }
