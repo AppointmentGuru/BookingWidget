@@ -1,10 +1,16 @@
+<!--
+todo:
+
+Slotpicker:
+* exclude closed parts of day
+-->
 <template>
   <div >
-    <!-- <div >
+    <div >
     {{selectedDate}}<br/>
     <pre>{{appointment}}</pre>
     <pre>{{slotOptions}}</pre>
-    </div> -->
+    </div>
     <el-steps
       style='width:350px;margin-left:auto;margin-right:auto;'
       :active="currentStep"
@@ -37,10 +43,10 @@
         </div>
         <slot-picker
           v-if='selectedProduct'
-          :start-time='slotOptions.startTime'
-          :end-time='slotOptions.endTime'
+          :operation-hours='slotOptions.operationHours'
           :slot-duration='slotOptions.duration'
           :day='slotOptions.day'
+          :appointments='selectedDayAppointments'
           @slotpicker:slotselected='slotSelected' >
         </slot-picker>
       </el-carousel-item>
@@ -49,7 +55,9 @@
         </contact-details-form>
       </el-carousel-item>
     </el-carousel>
-    <toolbar text='Create Appointment'></toolbar>
+    <toolbar
+      @toolbar:click='createAppointment'
+      text='Create Appointment'></toolbar>
   </div>
 </template>
 
@@ -99,27 +107,34 @@ export default {
         end_time: this.selectedSlot.endTime,
         product: this.selectedProduct.id || false,
         full_name: this.contactDetails.fullName,
-        contact_phone: this.contactDetails.phone,
-        email: this.contactDetails.email
+        contact_phone: this.contactDetails.formattedNumber,
+        contact_email: this.contactDetails.email,
+        practitioner: window.practitioner,
+        source: 'booking-widget'
       }
+    },
+    selectedDayAppointments () {
+      if (this.selectedDate) {
+        let selectedDate = this.selectedDate
+        let appointments = this.$gurustore.state.appointments.appointments
+        let result = appointments.filter((app) => {
+          return moment(app.start_time).format('YYYY-MM-DD') === selectedDate
+        })
+        return result
+      }
+      return []
     },
     slotOptions () {
       let dt = moment(this.selectedDate).format('ddd')
       if (dt.toLowerCase() === 'tue') { dt = 'tues' }
       if (dt.toLowerCase() === 'thu') { dt = 'thurs' }
-      let startTime = '08:00'
-      let endTime = '17:00'
+      let operationHours = '08:00-17:00'
       if (this.selectedService.hours) {
-        let hrsString = this.selectedService.hours[dt.toLowerCase()]
-        if (hrsString) {
-          let hrsBits = hrsString.split('|')
-          startTime = hrsBits[0].split('-')[0]
-          endTime = hrsBits[hrsBits.length - 1].split('-')[1]
-        }
+        operationHours = this.selectedService.hours[dt.toLowerCase()]
       }
+      console.log(operationHours)
       return {
-        startTime: startTime,
-        endTime: endTime,
+        operationHours: operationHours,
         duration: parseInt(this.selectedProduct.duration) || 60,
         day: this.selectedDate
       }
@@ -140,6 +155,15 @@ export default {
     slotSelected (slot) {
       this.selectedSlot = slot
       this.next()
+    },
+    createAppointment () {
+      this.$gurustore.dispatch(
+        'CREATE_APPOINTMENT_ACTION',
+        this.appointment)
+          .then((response) => {
+            console.log(response.data)
+            window.alert('Appointment created!!!11!!!11')
+          })
     }
   }
 }

@@ -7,7 +7,16 @@ import VueFlatpickr from 'vue-flatpickr'
 import GuruPlugin from 'guruclientstore/src/store/plugin'
 
 import {
-  Card, Step, Steps, Button, Carousel, CarouselItem, Form, FormItem, Input
+  Card,
+  Step,
+  Steps,
+  Button,
+  Carousel,
+  CarouselItem,
+  Form,
+  FormItem,
+  Input
+  // AutoComplete
 } from 'element-ui'
 
 import 'element-ui/lib/theme-default/index.css'
@@ -27,6 +36,7 @@ Vue.use(CarouselItem)
 Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Input)
+// Vue.use(AutoComplete)
 
 /* eslint-disable no-new */
 new Vue({

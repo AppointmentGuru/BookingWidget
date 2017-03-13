@@ -12,14 +12,17 @@
 </style>
 <template>
 <div class='toolbar'>
-  <el-button class='btn-block' type="primary" size="large">{{text}}</el-button>
+  <el-button
+    @click='$emit("toolbar:click")'
+    class='btn-block' type="primary" size="large">{{text}}</el-button>
 </div>
 </template>
 <script type="text/javascript">
 export default {
   name: 'Toolbar',
   props: {
-    text: { type: String, required: true }
+    text: { type: String, required: true },
+    disabled: { type: Boolean, default: false }
   }
 }
 </script>
