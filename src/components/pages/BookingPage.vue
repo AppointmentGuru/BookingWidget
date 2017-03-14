@@ -14,6 +14,7 @@ Slotpicker:
     </div>
     -->
     <el-steps
+      v-if='products.length > 1'
       v-show='showSteps'
       style='width:350px;margin-left:auto;margin-right:auto;'
       :active="currentStep"
@@ -21,7 +22,7 @@ Slotpicker:
       finish-status='success'
       :align-center='true'
       :space='150' >
-      <el-step @click.native='goto(0)' title="Type" ></el-step>
+      <el-step @click.native='goto(0)' title="Appointment" ></el-step>
       <el-step @click.native='goto(1)' title="Date" ></el-step>
       <el-step @click.native='goto(2)' title="Contacts" ></el-step>
     </el-steps>
@@ -35,14 +36,15 @@ Slotpicker:
       v-loading="loading"
       element-loading-text="Creating appointment..." >
 
-      <el-carousel-item >
+      <el-carousel-item v-if='products.length > 1' >
+        <h1 class='h1'>What type of appointment?</h1>
         <choose-appointment-type
           id='appointment-type'
           @bookingwidget:productselected='appointmentTypeSelected' >
         </choose-appointment-type>
       </el-carousel-item>
       <el-carousel-item >
-        <br/>
+        <h1 class='h1'>When works for you?</h1>
         <date-picker
           @datepicker:rangechanged='updateActiveDateRange'
           v-model='selectedDate' >
@@ -65,6 +67,7 @@ Slotpicker:
       </el-carousel-item>
 
       <el-carousel-item >
+        <h1 class='h1'>Your details</h1>
         <contact-details-form v-model='contactDetails' >
         </contact-details-form>
       </el-carousel-item>
@@ -150,6 +153,20 @@ export default {
         practitioner: window.practitioner,
         source: 'booking-widget'
       }
+    },
+    products () {
+      let products = []
+      if (this.$gurustore.state.practitioner &&
+          this.$gurustore.state.practitioner.practitioner &&
+          this.$gurustore.state.practitioner.practitioner.profile) {
+        let services = this.$gurustore.state.practitioner.practitioner.profile.services
+        for (let service of services) {
+          for (let product of service.products) {
+            products.push(product)
+          }
+        }
+      }
+      return products
     },
     appointmentIsValid () {
       return (this.appointment.start_time &&
@@ -266,5 +283,13 @@ export default {
   background: transparent !important;
   border: 0px;
   height: 34px;
+}
+
+h1.h1 {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 400;
+  border-bottom: solid 1px #48576a;
+  padding-bottom: 10px;
 }
 </style>
