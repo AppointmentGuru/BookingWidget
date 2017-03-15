@@ -2,7 +2,10 @@
 <div class='confirmation'>
   <el-progress type="circle" :percentage="100" status="success"></el-progress>
   <h3>Appointment created</h3>
-  <p>You appointment is set up and has been added to {{practitioner.first_name}}'s diary. All you need to do now is arrive.</p>
+  <p>Your appointment is set up and has been added to {{practitioner.first_name}}'s diary. You're all set!</p>
+  <p>
+    <a href='http://www.getapp.guru/' >Download</a> the AppointmentGuru mobile app to keep track of this appointment and book further appointments from the comfort of your mobile phone
+  </p>
 
   <el-tabs value='first' >
     <el-tab-pane label="What's next" name="first">

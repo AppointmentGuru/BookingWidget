@@ -22,9 +22,9 @@ Slotpicker:
       finish-status='success'
       :align-center='true'
       :space='150' >
-      <el-step @click.native='goto(0)' title="Appointment" ></el-step>
-      <el-step @click.native='goto(1)' title="Date" ></el-step>
-      <el-step @click.native='goto(2)' title="Contacts" ></el-step>
+      <el-step @click.native='goto(0)' :title="selectedTypeStepText" ></el-step>
+      <el-step @click.native='goto(1)' :title="selectDateStepText" ></el-step>
+      <el-step @click.native='goto(2)' title="Details" ></el-step>
     </el-steps>
     <el-carousel
       height="500px"
@@ -36,17 +36,30 @@ Slotpicker:
       v-loading="loading"
       element-loading-text="Creating appointment..." >
 
-      <el-carousel-item v-if='products.length > 1' >
-        <h1 class='h1'>What type of appointment?</h1>
+      <el-carousel-item >
+        <h1
+          v-show='products.length > 1'
+          class='h1'>What type of appointment?</h1>
         <choose-appointment-type
           id='appointment-type'
+          v-show='products.length > 1'
           @bookingwidget:productselected='appointmentTypeSelected' >
         </choose-appointment-type>
       </el-carousel-item>
       <el-carousel-item >
-        <h1 class='h1'>When works for you?</h1>
+        <h1 class='h1'>
+          <a
+            v-if='products.length > 1'
+            v-show='currentStep > 0'
+            class='clickable back-btn'
+            @click='back' >< back</a>
+          When works for you?</h1>
         <date-picker
+          ref='datepicker'
           @datepicker:rangechanged='updateActiveDateRange'
+          :hours='selectedService.hours'
+          :slot-duration='slotOptions.duration'
+          :appointments='appointments'
           v-model='selectedDate' >
         </date-picker>
         <div style='padding: 10px; 5px; text-align:center;font-weight:bold;'>
@@ -67,13 +80,18 @@ Slotpicker:
       </el-carousel-item>
 
       <el-carousel-item >
-        <h1 class='h1'>Your details</h1>
+        <h1 class='h1'>
+          <a
+            class='clickable back-btn'
+            @click.prevent='back'
+            v-show='currentStep > 0' >< back</a>
+          Your details</h1>
         <contact-details-form v-model='contactDetails' >
         </contact-details-form>
       </el-carousel-item>
 
       <el-carousel-item >
-        <confirmation-page ></confirmation-page>
+        <confirmation-page v-show='appointmentComplete' ></confirmation-page>
       </el-carousel-item>
 
     </el-carousel>
@@ -134,6 +152,11 @@ export default {
       window.practitioner
     ).then(() => {
       this.$gurustore.dispatch('FETCH_APPOINTMENTS_ACTION')
+      if (this.products.length === 1) {
+        this.selectedService = this.$gurustore.state.practitioner.practitioner.profile.services[0]
+        this.selectedProduct = this.products[0]
+        this.currentStep = 1
+      }
     })
   },
   watch: {
@@ -153,6 +176,16 @@ export default {
         practitioner: window.practitioner,
         source: 'booking-widget'
       }
+    },
+    selectedTypeStepText () {
+      if (this.currentStep < 1) { return 'What?' }
+      return this.selectedProduct.title
+    },
+    selectDateStepText () {
+      if (this.currentStep < 2) { return 'When?' }
+      let day = this.naturalday(this.selectedDate)
+      let time = moment(this.selectedSlot.startTime).format('HH:mm')
+      return `${day} @${time}`
     },
     products () {
       let products = []
@@ -185,11 +218,13 @@ export default {
         return 'Create appointment'
       }
     },
+    appointments () {
+      return this.$gurustore.state.appointments.appointments
+    },
     selectedDayAppointments () {
       if (this.selectedDate) {
         let selectedDate = this.selectedDate
-        let appointments = this.$gurustore.state.appointments.appointments
-        let result = appointments.filter((app) => {
+        let result = this.appointments.filter((app) => {
           return moment(app.start_time).format('YYYY-MM-DD') === selectedDate
         })
         return result
@@ -215,6 +250,9 @@ export default {
     next () {
       this.currentStep++
     },
+    back () {
+      this.currentStep--
+    },
     goto (step) {
       if (this.currentStep >= step) {
         this.currentStep = step
@@ -227,6 +265,7 @@ export default {
       this.$gurustore.dispatch('SET_DATE_RANGE_ACTION', daterange)
         .then(() => {
           vm.loadingAppointments = false
+          vm.redraw()
         })
     },
     appointmentTypeSelected (payload) {
@@ -269,6 +308,9 @@ export default {
 <style >
 .el-steps { margin-top:30px; }
 .el-step { width: 32%; }
+.el-step__title {
+    line-height: 15px !important;
+    margin-top: 5px; }
 .el-carousel {
   overflow-y: scroll;
 }
@@ -277,6 +319,12 @@ export default {
 }
 .el-card__header {
   font-weight: bold;
+}
+.back-btn {
+  font-size: small;
+  position: absolute;
+  left: 10px;
+  top: 18px;
 }
 .el-input-group__prepend .el-input__inner {
   min-width: 60px;
