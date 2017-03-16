@@ -339,6 +339,6 @@ h1.h1 {
   font-weight: 400;
   border-bottom: solid 1px #48576a;
   padding-bottom: 10px;
-  color: #2c3e50;
+  color: #2c3e50 !important;
 }
 </style>
