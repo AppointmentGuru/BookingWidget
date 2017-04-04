@@ -18756,7 +18756,7 @@ if (false) {
 }
 
 let http = __WEBPACK_IMPORTED_MODULE_0_axios___default.a.create({
-  baseURL: "http://api.appointmentguru.co",
+  baseURL: "https://beta.appointmentguru.co",
   headers: {
     'Content-Type': 'application/json'
   }
@@ -70093,4 +70093,4 @@ function applyToTag (styleElement, obj) {
 
 /***/ })
 ]);
-//# sourceMappingURL=vendor.3c422a1ee25f042cf47d.js.map
+//# sourceMappingURL=vendor.3b2ec702d2b7ac8bdbe9.js.map
