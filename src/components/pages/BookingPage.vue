@@ -325,6 +325,7 @@ export default {
   position: absolute;
   left: 10px;
   top: 18px;
+  cursor: pointer;
 }
 .el-input-group__prepend .el-input__inner {
   min-width: 60px;
